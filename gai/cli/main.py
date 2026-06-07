@@ -82,6 +82,13 @@ def cmd_init(_: argparse.Namespace) -> int:
     return 0
 
 
+def _normalize_provider_model(provider: str, model: str) -> str:
+    if provider == "github":
+        if model in {"github/copilot", "github/copilot-1", "github/copilot-2"}:
+            return "openai/gpt-5"
+    return model
+
+
 def _provider_setup_instructions(provider: str) -> str | None:
     if provider == "github":
         return (
@@ -103,8 +110,14 @@ def cmd_review(_: argparse.Namespace) -> int:
     staged_diff = get_staged_diff(cwd)
     config = load_config()
     provider = config.get("provider", "github")
-    model = config.get("model", DEFAULT_PROVIDER_MODELS.get(provider, "openai/gpt-5"))
+    model = _normalize_provider_model(
+        provider,
+        config.get("model", DEFAULT_PROVIDER_MODELS.get(provider, "openai/gpt-5")),
+    )
     token = get_token(provider)
+
+    if provider == "github" and model == "openai/gpt-5":
+        print("Using GitHub Models with model openai/gpt-5")
 
     print("Running local analyzers (when available)...")
     analyzer_reports = run_local_analyzers(cwd)

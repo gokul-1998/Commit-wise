@@ -3,7 +3,7 @@ import io
 import unittest
 from unittest.mock import patch
 
-from gai.cli.main import cmd_init
+from gai.cli.main import _normalize_provider_model, cmd_init
 
 
 class CliTests(unittest.TestCase):
@@ -23,3 +23,17 @@ class CliTests(unittest.TestCase):
         )
         self.assertIn("openai/gpt-5", output)
         mock_save_config.assert_called_once_with({"provider": "github", "model": "openai/gpt-5"})
+
+    def test_normalize_github_model_alias(self):
+        self.assertEqual(
+            _normalize_provider_model("github", "github/copilot"),
+            "openai/gpt-5",
+        )
+        self.assertEqual(
+            _normalize_provider_model("github", "github/copilot-1"),
+            "openai/gpt-5",
+        )
+        self.assertEqual(
+            _normalize_provider_model("github", "openai/gpt-5"),
+            "openai/gpt-5",
+        )
