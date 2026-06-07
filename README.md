@@ -2,6 +2,33 @@
 
 Open Source Commit and PR reviewer.
 
+## Install
+
+Install the library from PyPI:
+
+```bash
+pip install gai-review
+```
+
+Install directly from the source repository:
+
+```bash
+pip install .
+```
+
+Install from GitHub (replace `OWNER` with the repository owner):
+
+```bash
+pip install git+https://github.com/gokul-1998/Commit-wise.git
+```
+ 
+To Force Reinstall
+
+```base
+pip install --force-reinstall --no-cache-dir git+https://github.com/gokul-1998/Commit-wise.git
+```
+
+
 ## CLI MVP (`gai`)
 
 This repository now includes a minimal local CLI for staged-change review.

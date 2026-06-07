@@ -12,6 +12,20 @@ from gai.prompts.review_prompt import build_explain_prompt
 from gai.providers.reviewer import ReviewResult, review_staged_changes
 
 PROVIDERS = ["github", "openai", "anthropic", "gemini", "ollama"]
+DEFAULT_PROVIDER_MODELS = {
+    "github": "github/copilot",
+    "openai": "openai/gpt-5-mini",
+    "anthropic": "anthropic/claude-3",
+    "gemini": "gemini/1",
+    "ollama": "ollama/ollama-small",
+}
+
+GITHUB_PAT_URL = (
+    "https://github.com/settings/personal-access-tokens/new?"
+    "description=Used+to+call+GitHub+Models+APIs+to+easily+run+LLMs%3A+"
+    "https%3A%2F%2Fdocs.github.com%2Fgithub-models%2Fquickstart%23step-2-make-an-api-call&"
+    "name=GitHub+Models+token&user_models=read"
+)
 
 
 def _status(flag: bool) -> str:
@@ -51,17 +65,32 @@ def cmd_init(_: argparse.Namespace) -> int:
         print("Invalid provider selection.")
         return 1
 
+    setup_info = _provider_setup_instructions(provider)
+    if setup_info:
+        print(setup_info)
+
     token = input(f"Enter {provider} token (stored securely with keyring):\n> ").strip()
     if not token:
         print("Token is required.")
         return 1
 
     set_token(provider, token)
-    save_config({"provider": provider, "model": "openai/gpt-5-mini"})
+    save_config({"provider": provider, "model": DEFAULT_PROVIDER_MODELS.get(provider, "openai/gpt-5-mini")})
 
     print("\nSaved ~/.gai/config.toml (without token).")
     print("Token saved in keyring.")
     return 0
+
+
+def _provider_setup_instructions(provider: str) -> str | None:
+    if provider == "github":
+        return (
+            "\nGitHub provider requires a Personal Access Token (PAT).\n"
+            f"Create one at: {GITHUB_PAT_URL}\n"
+            "Select scopes: repo, workflow (and read:org if needed).\n"
+            "Recommended model for GitHub provider: github/copilot\n"
+        )
+    return None
 
 
 def cmd_review(_: argparse.Namespace) -> int:
