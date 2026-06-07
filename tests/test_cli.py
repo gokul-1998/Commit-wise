@@ -21,5 +21,5 @@ class CliTests(unittest.TestCase):
             "https://github.com/settings/personal-access-tokens/new?description=Used+to+call+GitHub+Models+APIs+to+easily+run+LLMs%3A+https%3A%2F%2Fdocs.github.com%2Fgithub-models%2Fquickstart%23step-2-make-an-api-call&name=GitHub+Models+token&user_models=read",
             output,
         )
-        self.assertIn("github/copilot", output)
-        mock_save_config.assert_called_once_with({"provider": "github", "model": "github/copilot"})
+        self.assertIn("openai/gpt-5", output)
+        mock_save_config.assert_called_once_with({"provider": "github", "model": "openai/gpt-5"})
