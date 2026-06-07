@@ -24,6 +24,31 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install build twine
 
+      - name: Set package version from Git tag
+        env:
+          GITHUB_TAG: ${{ github.ref_name }}
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          import os
+
+          tag = os.environ['GITHUB_TAG']
+          version = tag[1:] if tag.startswith('v') else tag
+          pyproject = Path('pyproject.toml')
+          text = pyproject.read_text(encoding='utf-8')
+          updated = re.sub(
+              r'(?m)^version\s*=\s*".*"$',
+              f'version = "{version}"',
+              text,
+              count=1,
+          )
+          if text == updated:
+              raise SystemExit('Unable to update version in pyproject.toml')
+          pyproject.write_text(updated, encoding='utf-8')
+          print(f'Updated package version to {version}')
+          PY
+
       - name: Build package
         run: python -m build
 
