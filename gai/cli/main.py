@@ -13,7 +13,7 @@ from gai.providers.reviewer import ReviewResult, review_staged_changes
 
 PROVIDERS = ["github", "openai", "anthropic", "gemini", "ollama"]
 DEFAULT_PROVIDER_MODELS = {
-    "github": "github/copilot",
+    "github": "openai/gpt-5",
     "openai": "openai/gpt-5-mini",
     "anthropic": "anthropic/claude-3",
     "gemini": "gemini/1",
@@ -88,7 +88,7 @@ def _provider_setup_instructions(provider: str) -> str | None:
             "\nGitHub provider requires a Personal Access Token (PAT).\n"
             f"Create one at: {GITHUB_PAT_URL}\n"
             "Select scopes: repo, workflow (and read:org if needed).\n"
-            "Recommended model for GitHub provider: github/copilot\n"
+            "Recommended model for GitHub provider: openai/gpt-5\n"
         )
     return None
 
@@ -101,7 +101,10 @@ def cmd_review(_: argparse.Namespace) -> int:
         return 1
 
     staged_diff = get_staged_diff(cwd)
-    _ = load_config()
+    config = load_config()
+    provider = config.get("provider", "github")
+    model = config.get("model", DEFAULT_PROVIDER_MODELS.get(provider, "openai/gpt-5"))
+    token = get_token(provider)
 
     print("Running local analyzers (when available)...")
     analyzer_reports = run_local_analyzers(cwd)
@@ -109,8 +112,12 @@ def cmd_review(_: argparse.Namespace) -> int:
         short = report.splitlines()[0] if report else ""
         print(f"→ {name}: {short}")
 
-    result = review_staged_changes(staged_files, staged_diff)
-    _print_review(result)
+    result = review_staged_changes(staged_files, staged_diff, provider=provider, model=model, token=token)
+    if isinstance(result, str):
+        print("\nGitHub Models review:\n")
+        print(result)
+    else:
+        _print_review(result)
 
     proceed = input("\nProceed with commit? [y/N] ").strip().lower()
     if proceed in {"y", "yes"}:

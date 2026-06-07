@@ -3,12 +3,19 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "gai-review"
-version = "0.1.0"
+name = "commitwise-review"
+version = "0.1.1"
 description = "Git staged-change AI review helper"
 readme = "README.md"
+authors = [
+    {name = "Gokulakrishnan"}
+]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "keyring",
+    "azure-ai-inference"
+]
 
 [project.scripts]
+commit-wise = "gai.cli.main:main"
 gai = "gai.cli.main:main"

@@ -7,7 +7,7 @@ Open Source Commit and PR reviewer.
 Install the library from PyPI:
 
 ```bash
-pip install gai-review
+pip install commitwise-review
 ```
 
 Install directly from the source repository:
@@ -16,24 +16,48 @@ Install directly from the source repository:
 pip install .
 ```
 
-Install from GitHub (replace `OWNER` with the repository owner):
+Install from GitHub:
 
 ```bash
 pip install git+https://github.com/gokul-1998/Commit-wise.git
 ```
- 
-To Force Reinstall
 
-```base
+To force reinstall:
+
+```bash
 pip install --force-reinstall --no-cache-dir git+https://github.com/gokul-1998/Commit-wise.git
 ```
 
+## Versioning
 
-## CLI MVP (`gai`)
+This project uses Semantic Versioning:
+
+```bash
+MAJOR.MINOR.PATCH
+```
+
+Example release plan:
+
+- `0.1.0` — initial release
+- `0.2.0` — new features
+- `0.2.1` — bug fixes and prompt improvements
+- `1.0.0` — stable public release
+
+## CLI MVP (`commit-wise`)
 
 This repository now includes a minimal local CLI for staged-change review.
 
 ### Commands
+
+```bash
+commit-wise init
+commit-wise review
+commit-wise explain
+commit-wise commit
+commit-wise hooks install
+```
+
+The old `gai` alias is still available:
 
 ```bash
 gai init
@@ -43,7 +67,7 @@ gai commit
 gai hooks install
 ```
 
-### What `gai review` does
+### What `commit-wise review` does
 
 - Reads staged files from `git diff --cached --name-only`
 - Reads staged diff from `git diff --cached`
