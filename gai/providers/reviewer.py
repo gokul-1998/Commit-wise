@@ -68,9 +68,22 @@ def _call_github_models(staged_diff: str, model: str, token: str) -> str:
             UserMessage(build_explain_prompt(staged_diff)),
         ],
         model=model,
+        request_timeout=60,
     )
 
-    return response.choices[0].message.content or ""
+    if hasattr(response, '__iter__') and not isinstance(response, str):
+        chunks = []
+        for part in response:
+            if hasattr(part, 'message') and getattr(part, 'message') is not None:
+                chunks.append(getattr(part.message, 'content', '') or '')
+            elif hasattr(part, 'content'):
+                chunks.append(getattr(part, 'content', '') or '')
+        return ''.join(chunks).strip()
+
+    if hasattr(response, 'choices') and response.choices:
+        return response.choices[0].message.content or ""
+
+    return ""
 
 
 def _local_review_staged_changes(staged_files: list[str], staged_diff: str) -> ReviewResult:
